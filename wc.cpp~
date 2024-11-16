@@ -4,61 +4,75 @@
 #include<fstream>
 #include<sstream>
 #include<locale>
-#include<codecvt>
 using namespace std;
 
+static void printSize(string file) {
+    cout << filesystem::file_size(file) << " " << "\t";
+}
+static void printLines(string file) {
+    std::ifstream myfile(file);
+    if (myfile.is_open()) {
+        myfile.unsetf(std::ios_base::skipws);
+        unsigned int line_count = std::count(std::istream_iterator<char>(myfile), std::istream_iterator<char>(), '\n'); 
+        cout << line_count << " lines" << "\t";
+    }
+    myfile.close(); 
+}
+static void printWords(string file) {
+    std::ifstream myfile(file);
+    if (myfile.is_open()) {
+        string line;
+        int wordCount = 0;
+        while (std::getline(myfile, line)) {
+            std::stringstream ss(line);
+            string word;
+            while (ss >> word) {
+                wordCount++;
+            }
+        }
+        cout << wordCount << " words" << "\t";
+    }
+    myfile.close(); 
+}
+static void printCharacters(string file) {
+    int charCount = 0;
+    std::locale::global(std::locale(""));
+    std::wifstream myfile(file);
+    wchar_t ch;
+    if (myfile.is_open()) {
+        while (myfile.get(ch)) {
+            charCount++;
+        }
+     }
+    cout << charCount << " characters" << "\t";
+    myfile.close();  
+}
 static void action(string flag, string file) {
     if (flag.compare("-c") == 0) {
-        cout << filesystem::file_size(file) << " " << file << "\n";
+        printSize(file);
     } else if (flag.compare("-l") == 0) {
-        std::ifstream myfile(file);
-        if (myfile.is_open()) {
-            myfile.unsetf(std::ios_base::skipws);
-            unsigned int line_count = std::count(std::istream_iterator<char>(myfile), std::istream_iterator<char>(), '\n'); 
-            cout << line_count << " lines " << file << "\n";
-        }
-        myfile.close();
+        printLines(file);
     } else if (flag.compare("-w") == 0) {
-        std::ifstream myfile(file);
-        if (myfile.is_open()) {
-            string line;
-            int wordCount = 0;
-            while (std::getline(myfile, line)) {
-                std::stringstream ss(line);
-                string word;
-                while (ss >> word) {
-                    wordCount++;
-                }
-            }
-            cout << wordCount << " words " << file << "\n";
-        }
-        myfile.close();
+        printWords(file);
     } else if (flag.compare("-m") == 0) {
-        int charCount = 0;
-        std::locale::global(std::locale(""));
-        std::wifstream myfile(file);
-//        std::locale utf8_locale(std::locale(std::locale(), new std::codecvt_utf8<char>);
-//        myfile.imbue(utf8_locale);
-        wchar_t ch;
-        if (myfile.is_open()) {
-            while (myfile.get(ch)) {
-                charCount++;
-            }
-        }
-        cout << charCount << " characters " << file << "\n";
-        myfile.close(); 
+        printCharacters(file); 
+    } else if (flag.compare("") == 0) {
+        printSize(file);
+        printLines(file);
+        printWords(file);
     }
+    cout << file << "\n";
 }
 int main(int argc, char** argv) {
     string flag;
-    string file; 
-    if(argc == 3) {
+    string file;
+    if (argc == 2) {
+        flag = "";
+        file = argv[1];
+    } else if (argc == 3) { 
         flag = argv[1];
         file = argv[2];
-        action(flag, file);
-    } else {
-        cout << "Incorrect arguments\n";
     }
-    cout << "Program compiled successfully.";
+    action(flag, file);
     return 0;
 }
