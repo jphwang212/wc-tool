@@ -4,7 +4,7 @@
 #include<fstream>
 #include<sstream>
 #include<locale>
-
+#include<codecvt>
 using namespace std;
 
 static void action(string flag, string file) {
@@ -34,18 +34,17 @@ static void action(string flag, string file) {
         }
         myfile.close();
     } else if (flag.compare("-m") == 0) {
-        std::locale::global(std::locale("utf-8"));
-        char current_char;
         int charCount = 0;
-        std::locale mylocale("");
-        std::ifstream myfile(file);
-        myfile.imbue(mylocale);
+        std::locale::global(std::locale(""));
+        std::wifstream myfile(file);
+//        std::locale utf8_locale(std::locale(std::locale(), new std::codecvt_utf8<char>);
+//        myfile.imbue(utf8_locale);
+        wchar_t ch;
         if (myfile.is_open()) {
-            while (myfile.get(current_char)) {
+            while (myfile.get(ch)) {
                 charCount++;
             }
         }
-
         cout << charCount << " characters " << file << "\n";
         myfile.close(); 
     }

@@ -4,7 +4,6 @@
 #include<fstream>
 #include<sstream>
 #include<locale>
-#include<codecvt>
 using namespace std;
 
 static void action(string flag, string file) {
@@ -15,7 +14,7 @@ static void action(string flag, string file) {
         if (myfile.is_open()) {
             myfile.unsetf(std::ios_base::skipws);
             unsigned int line_count = std::count(std::istream_iterator<char>(myfile), std::istream_iterator<char>(), '\n'); 
-            cout << line_count << " lines " << file << "\n";
+            cout << line_count << " lines | " << file << "\n";
         }
         myfile.close();
     } else if (flag.compare("-w") == 0) {
@@ -30,21 +29,20 @@ static void action(string flag, string file) {
                     wordCount++;
                 }
             }
-            cout << wordCount << " words " << file << "\n";
+            cout << wordCount << " words | " << file << "\n";
         }
         myfile.close();
     } else if (flag.compare("-m") == 0) {
-        char current_char;
         int charCount = 0;
-        std::ifstream myfile(file);
-        myfile.imbue(std::locale("en_US.UTF-8"));
+        std::locale::global(std::locale(""));
+        std::wifstream myfile(file);
+        wchar_t ch;
         if (myfile.is_open()) {
-            while (myfile.get(current_char)) {
+            while (myfile.get(ch)) {
                 charCount++;
             }
         }
-
-        cout << charCount << " characters " << file << "\n";
+        cout << charCount << " characters | " << file << "\n";
         myfile.close(); 
     }
 }
